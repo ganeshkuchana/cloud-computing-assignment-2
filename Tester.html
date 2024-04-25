@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wine Quality Tester</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #eaeaea;
+            margin: 0;
+            padding: 20px;
+            display: grid;
+            place-items: center;
+            height: 100vh;
+            color: #4a4a4a;
+        }
+
+        h1 {
+            color: #5d1049;
+        }
+
+        #uploadForm {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        label {
+            font-size: 16px;
+            color: #5d1049;
+        }
+
+        #fileInput {
+            border: 2px solid #5d1049;
+            padding: 8px;
+            width: 100%;
+            cursor: pointer;
+            border-radius: 6px;
+        }
+
+        input[type="submit"] {
+            background-color: #5d1049;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #812f76;
+        }
+
+        #result {
+            display: none;
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #dff0d8;
+            color: #3c763d;
+            border: 1px solid #d6e9c6;
+            border-radius: 6px;
+            width: 100%;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>Wine Quality Tester</h1>
+    <form id="uploadForm" action="http://ec2-54-226-221-43.compute-1.amazonaws.com:5000/predict" method="post" enctype="multipart/form-data">
+        <label for="fileInput">Upload wine data file:</label>
+        <input type="file" name="file" id="fileInput">
+        <input type="submit" value="Predict Quality">
+    </form>
+    <p id="result"></p>
+
+    <script>
+        document.getElementById("uploadForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            const fileInput = document.getElementById("fileInput");
+            const file = fileInput.files[0];
+            const formData = new FormData();
+            formData.append("file", file);
+
+            fetch("http://ec2-54-226-221-43.compute-1.amazonaws.com:5000/predict", {
+                method: "POST",
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                const resultElement = document.getElementById("result");
+                resultElement.innerHTML = "Predicted F1 Score: " + data.f1_score;
+                resultElement.style.display = "block";
+            })
+            .catch(error => console.error("Error:", error));
+        });
+    </script>
+</body>
+</html>
